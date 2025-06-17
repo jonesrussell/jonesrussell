@@ -1,6 +1,4 @@
-# Russell Jones
-
-**Software Developer & Technical Content Creator**
+# Software Developer & Technical Content Creator
 
 I'm a full-stack developer specializing in PHP and Go, with deep expertise in Drupal and Laravel frameworks. With over 6,000 contributions in the past year, I focus on building scalable web applications and developer tools while sharing knowledge through open source contributions and educational content.
 
