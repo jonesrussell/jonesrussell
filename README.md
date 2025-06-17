@@ -1,29 +1,44 @@
-## Ahnii!
+# Russell Jones
 
-Welcome to my GitHub profile! I'm a passionate developer with a love for software and exploring new technologies.
+**Software Developer & Technical Content Creator**
 
-### 🔭 Current Projects
-- **Tutorials**: Sharing web development and programming experience on YouTube at https://www.youtube.com/@fullstackdev42.
-- **Game Development**: Working on a Gyrus clone using Ebitengine, A dead simple 2D game engine for Go.
-- **Web Crawler**: Developing a web crawler to help gather and analyze data from various sources, because why not?
-- **Stop Motion Video**: Difficult and fun!
+I'm a full-stack developer specializing in PHP and Go, with deep expertise in Drupal and Laravel frameworks. With over 6,000 contributions in the past year, I focus on building scalable web applications and developer tools while sharing knowledge through open source contributions and educational content.
 
-### 🌱 Learning Journey
-- Currently immersed in **Golang** to expand my programming skills and explore new possibilities.
+## Current Focus
 
-### 👯 Collaboration
-- Always open to collaborating on interesting projects. If you have an idea or need help, feel free to reach out!
+**Game Development**: Building a Gyrus clone using Ebitengine, exploring 2D game architecture and Go's capabilities in interactive applications.
 
-### 🤔 Comments and Feedback
-- I'm always grateful for feedback and suggestions on my projects. Your insights are valuable!
+**Developer Tools**: Contributing to DDEV, a Docker-based local development environment with 3.2K stars, helping streamline PHP and Node.js development workflows.
 
-### 💬 Ask Me About
-- Anything you want.
+**Web Infrastructure**: Developing web crawling solutions and form management systems, including GoFormX - a comprehensive form builder and backend solution.
 
-### 📫 More of Me
-- **Website**: [jonesrussell.github.io/me](https://jonesrussell.github.io/me/)
-- **Twitter**: [@jonesrussell42](https://x.com/jonesrussell42)
-- **YouTube**: [FullStackDev42](https://youtube.com/@fullstackdev42)
-- **LinkedIn**: [in/jonesrussell42](https://linkedin.com/in/jonesrussell42)
+**Content Creation**: Producing technical tutorials and programming content on YouTube, documenting real-world development challenges and solutions.
 
-Explore my repositories and connect to me through code with a Pull Request. :)
+## Notable Projects
+
+**DDEV Contributor**: Active contributor to one of the most popular local development tools in the PHP ecosystem, with significant contributions to core functionality.
+
+**GoFormX**: Lead developer of a form builder and backend system built in Go, focusing on performance and developer experience.
+
+**MP Emailer**: Created a civic engagement web application enabling constituents to contact their representatives efficiently.
+
+**Technical Blog**: Maintaining a Hugo-based blog documenting development insights and technical explorations.
+
+## Technical Expertise
+
+**Primary Languages**: PHP, Go  
+**PHP Frameworks**: Drupal, Laravel  
+**Go Ecosystem**: Uber FX, Cobra CLI, Viper, TUI, Echo, Uber Zap  
+**Tools & Platforms**: Docker, Hugo, Svelte, Ebitengine  
+**Specializations**: Web applications, developer tooling, game development, civic technology
+
+## Connect
+
+**Portfolio**: [jonesrussell.github.io/me](https://jonesrussell.github.io/me/)  
+**YouTube**: [FullStackDev42](https://youtube.com/@fullstackdev42)  
+**LinkedIn**: [jonesrussell42](https://linkedin.com/in/jonesrussell42)  
+**Twitter**: [@jonesrussell42](https://x.com/jonesrussell42)
+
+---
+
+*Open to collaboration on interesting projects and always welcome pull requests.*
