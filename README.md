@@ -1,7 +1,6 @@
-# **Russell Jones**
-**Backend developer, game dev learner, and infrastructure tinkerer.**
+# **Full stack developer, game dev learner, and infrastructure tinkerer.**
 
-I build systems that make developers faster — and break things in game engines so I can learn how they work.
+I build systems by leveraging AI.
 
 ## 🚀 What I’m Building
 - **North Cloud** — real‑time content intelligence with crawling, enrichment, and streaming pipelines.  
