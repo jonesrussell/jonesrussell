@@ -1,6 +1,6 @@
 # Russell Jones
 
-Software developer based in Massey, Ontario. 25 years building things across the full stack. I write Go and PHP, ship products, and document what I learn.
+Software developer based in Northern Ontario. 25 years building things across the full stack. I write Go and PHP, ship products, and document what I learn.
 
 ## What I'm building
 
