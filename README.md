@@ -13,4 +13,4 @@ Software developer based in Northern Ontario. 25 years building things across th
 
 I write about Go, PHP, and systems thinking. Current series: [Docker from Scratch](https://jonesrussell.github.io).
 
-[jonesrussell.github.io](https://jonesrussell.github.io) · [Gumroad](https://jonesrussell.gumroad.com)
+[jonesrussell.github.io/me](https://jonesrussell.github.io/me) · [Gumroad](https://jonesrussell.gumroad.com)
