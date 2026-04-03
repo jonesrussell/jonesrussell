@@ -20,4 +20,4 @@ I build the infrastructure Indigenous communities actually own.
 
 I write about AI-augmented development, building open source infrastructure, and what digital sovereignty looks like in code.
 
-[jonesrussell.github.io/me](https://jonesrussell.github.io/me) · [Blog](https://jonesrussell.github.io/blog) · [russell@web.net](mailto:russell@web.net)
+[jonesrussell.github.io/me](https://jonesrussell.github.io/me) · [Blog](https://jonesrussell.github.io/blog) · [Newsletter](https://jonesrussell42.substack.com) · [russell@web.net](mailto:russell@web.net)
