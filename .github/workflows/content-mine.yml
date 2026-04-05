@@ -27,8 +27,10 @@ jobs:
             echo "=== Scanning $REPO ==="
 
             # Get recent commits, filter noise
+            # Excluded: merge commits, chore, docs, bumps, and minor fix patterns
+            # (phpstan, namespace, alignment, placeholder, phpunit, mock, ignore, typo)
             COMMITS=$(gh api "repos/$REPO/commits?since=$SINCE&per_page=50" \
-              --jq '.[] | select(.commit.message | test("^(Merge |chore|fix typo|bump|update dep|Bump )"; "i") | not) | {sha: .sha[0:7], message: (.commit.message | split("\n") | .[0]), date: .commit.author.date}' \
+              --jq '.[] | select(.commit.message | test("^(Merge |chore|docs|fix typo|bump|update dep|Bump |fix:.*([Pp]hp[Ss]tan|namespace|alignment|placeholder|phpunit|mock|ignore|typo))"; "i") | not) | {sha: .sha[0:7], message: (.commit.message | split("\n") | .[0]), date: .commit.author.date}' \
               2>/dev/null || echo "")
 
             if [ -n "$COMMITS" ]; then
@@ -36,8 +38,8 @@ jobs:
                 MSG=$(echo "$line" | jq -r '.message')
                 SHA=$(echo "$line" | jq -r '.sha')
 
-                # Skip short messages
-                if [ ${#MSG} -lt 15 ]; then continue; fi
+                # Skip short messages (25 char min filters low-context commits)
+                if [ ${#MSG} -lt 25 ]; then continue; fi
 
                 # Check if already in queue
                 EXISTING=$(gh issue list --repo jonesrussell/jonesrussell --label "content-queue" --search "$SHA" --json number --jq 'length' 2>/dev/null || echo "0")
