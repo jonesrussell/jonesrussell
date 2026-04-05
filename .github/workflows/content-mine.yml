@@ -1,0 +1,106 @@
+name: Content Mining
+
+on:
+  schedule:
+    # Run daily at 8am ET (12:00 UTC)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  mine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mine recent activity
+        env:
+          GH_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+        run: |
+          SINCE=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
+          echo "Mining activity since $SINCE"
+
+          REPOS="waaseyaa/framework waaseyaa/giiken jonesrussell/jonesrussell"
+
+          for REPO in $REPOS; do
+            echo "=== Scanning $REPO ==="
+
+            # Get recent commits, filter noise
+            COMMITS=$(gh api "repos/$REPO/commits?since=$SINCE&per_page=50" \
+              --jq '.[] | select(.commit.message | test("^(Merge |chore|fix typo|bump|update dep|Bump )"; "i") | not) | {sha: .sha[0:7], message: (.commit.message | split("\n") | .[0]), date: .commit.author.date}' \
+              2>/dev/null || echo "")
+
+            if [ -n "$COMMITS" ]; then
+              echo "$COMMITS" | jq -c '.' | while IFS= read -r line; do
+                MSG=$(echo "$line" | jq -r '.message')
+                SHA=$(echo "$line" | jq -r '.sha')
+
+                # Skip short messages
+                if [ ${#MSG} -lt 15 ]; then continue; fi
+
+                # Check if already in queue
+                EXISTING=$(gh issue list --repo jonesrussell/jonesrussell --label "content-queue" --search "$SHA" --json number --jq 'length' 2>/dev/null || echo "0")
+                if [ "$EXISTING" != "0" ]; then
+                  echo "  Skipping (already queued): $MSG"
+                  continue
+                fi
+
+                echo "  Surfacing: $MSG ($SHA)"
+                gh issue create --repo jonesrussell/jonesrussell \
+                  --title "[content] $MSG" \
+                  --label "content-queue,stage:mined,type:text-post" \
+                  --body "## Source
+          Commit \`$SHA\` in \`$REPO\`
+
+          ## Content Seed
+          $MSG
+
+          ## Suggested Type
+          text-post
+
+          ## Suggested Channels
+          x, linkedin, facebook
+
+          ## Generated Artifacts
+          <!-- To be filled by production skill -->" || echo "  Failed to create issue for: $MSG"
+              done
+            fi
+
+            # Get recently closed issues (skip content-queue issues)
+            gh issue list --repo "$REPO" --state closed --json number,title,closedAt,labels \
+              --jq ".[] | select(.closedAt > \"$SINCE\") | select(.labels | map(.name) | index(\"content-queue\") | not) | {number, title}" \
+              2>/dev/null | jq -c '.' | while IFS= read -r line; do
+
+              [ -z "$line" ] && continue
+              TITLE=$(echo "$line" | jq -r '.title')
+              NUM=$(echo "$line" | jq -r '.number')
+
+              EXISTING=$(gh issue list --repo jonesrussell/jonesrussell --label "content-queue" --search "$REPO#$NUM" --json number --jq 'length' 2>/dev/null || echo "0")
+              if [ "$EXISTING" != "0" ]; then
+                echo "  Skipping (already queued): $TITLE"
+                continue
+              fi
+
+              echo "  Surfacing closed issue: $TITLE ($REPO#$NUM)"
+              gh issue create --repo jonesrussell/jonesrussell \
+                --title "[content] $TITLE" \
+                --label "content-queue,stage:mined,type:text-post" \
+                --body "## Source
+          Closed issue \`$REPO#$NUM\`
+
+          ## Content Seed
+          $TITLE
+
+          ## Suggested Type
+          text-post
+
+          ## Suggested Channels
+          x, linkedin, facebook
+
+          ## Generated Artifacts
+          <!-- To be filled by production skill -->" || echo "  Failed to create issue for: $TITLE"
+            done
+          done
+
+          echo "Mining complete."
