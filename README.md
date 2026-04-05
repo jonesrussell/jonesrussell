@@ -4,6 +4,22 @@ I'm Russell Jones, an Ojibwe developer from Sagamok Anishnawbek in Northern Onta
 
 I build the infrastructure Indigenous communities actually own.
 
+## Available for Contract Work
+
+Full-stack developer with 8+ years of experience. I build APIs, web applications, data pipelines, and infrastructure.
+
+**Stack:** Go, Laravel, PHP, Vue.js, TypeScript, Tailwind CSS, PostgreSQL, Redis, Elasticsearch, Docker
+
+**What I do:**
+- Backend APIs and microservices (Go, PHP/Laravel)
+- Full-stack web applications (Laravel + Vue/Inertia)
+- Data pipelines and content processing systems
+- DevOps and deployment automation (Docker, GitHub Actions, Caddy)
+
+**Availability:** Immediate, remote
+
+[Send me a message](mailto:russell@web.net) | [LinkedIn](https://linkedin.com/in/jonesrussell42) | [Blog](https://jonesrussell.github.io/blog)
+
 ## What I'm building
 
 - **[Waaseyaa](https://github.com/waaseyaa/framework)** — PHP framework for Indigenous governance. Entity system, access control, AI-native.
