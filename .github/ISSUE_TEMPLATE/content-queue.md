@@ -21,7 +21,7 @@ assignees: jonesrussell
 
 ## Suggested Channels
 
-<!-- x, linkedin, facebook, youtube, substack, devto, blog -->
+<!-- x, linkedin, facebook, youtube, substack, devto, blog, gumroad, topmate.io -->
 
 ## Generated Artifacts
 
