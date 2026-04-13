@@ -56,7 +56,7 @@ Distribute (Buffer API)
 
 **Mining targets:** The workflow scans `waaseyaa/framework`, `waaseyaa/giiken`, and this repo. It filters out merge commits, chore/docs/bump commits, short messages, and noise like phpstan/namespace fixes.
 
-**Content queue:** GitHub Issues on this repo with the `content-queue` label. Labels track stage: `stage:mined`, `stage:curated`, `stage:ready`. Content types: `type:text-post`, `type:blog-post`, `type:video`, `type:newsletter`.
+**Content queue:** [GitHub Issues on this repo](https://github.com/jonesrussell/jonesrussell/issues?q=label%3Acontent-queue) are the browser-visible interface to the entire pipeline. Every item passes through as an issue, labeled by stage (`stage:mined`, `stage:curated`, `stage:ready`) and type (`type:text-post`, `type:blog-post`, `type:video`, `type:newsletter`). Filter by label to see items at any stage.
 
 ## Repository Structure
 
