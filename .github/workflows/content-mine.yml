@@ -2,9 +2,14 @@ name: Content Mining
 
 on:
   schedule:
-    # Run daily at 8am ET (12:00 UTC)
-    - cron: '0 12 * * *'
-  workflow_dispatch: # Allow manual trigger
+    # Run daily at 11:00 UTC
+    - cron: '0 11 * * *'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Lookback window in days'
+        required: false
+        default: '1'
 
 permissions:
   issues: write
@@ -14,95 +19,16 @@ jobs:
   mine:
     runs-on: ubuntu-latest
     steps:
-      - name: Mine recent activity
+      - name: Checkout blog
+        uses: actions/checkout@v4
+        with:
+          repository: jonesrussell/blog
+
+      - name: Run canonical mining script
         env:
-          GH_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
-        run: |
-          SINCE=$(date -u -d '1 day ago' +%Y-%m-%dT%H:%M:%SZ)
-          echo "Mining activity since $SINCE"
-
-          REPOS="waaseyaa/framework waaseyaa/giiken jonesrussell/jonesrussell"
-
-          for REPO in $REPOS; do
-            echo "=== Scanning $REPO ==="
-
-            # Get recent commits, filter noise
-            # Excluded: merge commits, chore, docs, bumps, and minor fix patterns
-            # (phpstan, namespace, alignment, placeholder, phpunit, mock, ignore, typo)
-            COMMITS=$(gh api "repos/$REPO/commits?since=$SINCE&per_page=50" \
-              --jq '.[] | select(.commit.message | test("^(Merge |chore|docs|fix typo|bump|update dep|Bump |fix:.*([Pp]hp[Ss]tan|namespace|alignment|placeholder|phpunit|mock|ignore|typo))"; "i") | not) | {sha: .sha[0:7], message: (.commit.message | split("\n") | .[0]), date: .commit.author.date}' \
-              2>/dev/null || echo "")
-
-            if [ -n "$COMMITS" ]; then
-              echo "$COMMITS" | jq -c '.' | while IFS= read -r line; do
-                MSG=$(echo "$line" | jq -r '.message')
-                SHA=$(echo "$line" | jq -r '.sha')
-
-                # Skip short messages (25 char min filters low-context commits)
-                if [ ${#MSG} -lt 25 ]; then continue; fi
-
-                # Check if already in queue
-                EXISTING=$(gh issue list --repo jonesrussell/jonesrussell --label "content-queue" --search "$SHA" --json number --jq 'length' 2>/dev/null || echo "0")
-                if [ "$EXISTING" != "0" ]; then
-                  echo "  Skipping (already queued): $MSG"
-                  continue
-                fi
-
-                echo "  Surfacing: $MSG ($SHA)"
-                gh issue create --repo jonesrussell/jonesrussell \
-                  --title "[content] $MSG" \
-                  --label "content-queue,stage:mined,type:text-post" \
-                  --body "## Source
-          Commit \`$SHA\` in \`$REPO\`
-
-          ## Content Seed
-          $MSG
-
-          ## Suggested Type
-          text-post
-
-          ## Suggested Channels
-          x, linkedin, facebook
-
-          ## Generated Artifacts
-          <!-- To be filled by production skill -->" || echo "  Failed to create issue for: $MSG"
-              done
-            fi
-
-            # Get recently closed issues (skip content-queue issues)
-            gh issue list --repo "$REPO" --state closed --json number,title,closedAt,labels \
-              --jq ".[] | select(.closedAt > \"$SINCE\") | select(.labels | map(.name) | index(\"content-queue\") | not) | {number, title}" \
-              2>/dev/null | jq -c '.' | while IFS= read -r line; do
-
-              [ -z "$line" ] && continue
-              TITLE=$(echo "$line" | jq -r '.title')
-              NUM=$(echo "$line" | jq -r '.number')
-
-              EXISTING=$(gh issue list --repo jonesrussell/jonesrussell --label "content-queue" --search "$REPO#$NUM" --json number --jq 'length' 2>/dev/null || echo "0")
-              if [ "$EXISTING" != "0" ]; then
-                echo "  Skipping (already queued): $TITLE"
-                continue
-              fi
-
-              echo "  Surfacing closed issue: $TITLE ($REPO#$NUM)"
-              gh issue create --repo jonesrussell/jonesrussell \
-                --title "[content] $TITLE" \
-                --label "content-queue,stage:mined,type:text-post" \
-                --body "## Source
-          Closed issue \`$REPO#$NUM\`
-
-          ## Content Seed
-          $TITLE
-
-          ## Suggested Type
-          text-post
-
-          ## Suggested Channels
-          x, linkedin, facebook
-
-          ## Generated Artifacts
-          <!-- To be filled by production skill -->" || echo "  Failed to create issue for: $TITLE"
-            done
-          done
-
-          echo "Mining complete."
+          # CROSS_REPO_TOKEN must have read:org scope to access waaseyaa/* private repos.
+          # Falls back to GITHUB_TOKEN for public repos only.
+          GH_TOKEN: ${{ secrets.CROSS_REPO_TOKEN || secrets.GITHUB_TOKEN }}
+          LOOKBACK_DAYS: ${{ github.event.inputs.days || '1' }}
+          CI: 'true'
+        run: bash scripts/mine-git-activity.sh
