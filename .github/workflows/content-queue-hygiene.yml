@@ -1,0 +1,101 @@
+name: Content Queue Hygiene
+
+on:
+  schedule:
+    # Every Monday at 12:00 UTC
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (log only, no changes)'
+        required: false
+        default: 'true'
+        type: boolean
+
+permissions:
+  issues: write
+
+jobs:
+  expire-stale-mined:
+    name: Expire stale stage:mined issues
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      # For scheduled runs: always live. For dispatch: respect input.
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true && 'true' || 'false' }}
+
+    steps:
+      - name: Fetch stale mined issues and expire
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "=== Content Queue Hygiene ==="
+          echo "Repo:    $REPO"
+          echo "Dry run: $DRY_RUN"
+          echo "Run at:  $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo ""
+
+          CUTOFF=$(date -u -d '14 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          echo "Cutoff (older than 14 days): $CUTOFF"
+          echo ""
+
+          # Fetch up to 300 open issues with content-queue + stage:mined labels
+          ISSUES=$(gh issue list \
+            --repo "$REPO" \
+            --state open \
+            --label "content-queue,stage:mined" \
+            --limit 300 \
+            --json number,title,createdAt,labels)
+
+          TOTAL=$(echo "$ISSUES" | jq 'length')
+          echo "Total open stage:mined issues fetched: $TOTAL"
+
+          # Filter: created before cutoff AND does NOT have curate:keep
+          CANDIDATES=$(echo "$ISSUES" | jq --arg cutoff "$CUTOFF" '
+            [
+              .[] |
+              select(.createdAt < $cutoff) |
+              select(
+                (.labels | map(.name) | index("curate:keep")) == null
+              )
+            ]
+          ')
+
+          COUNT=$(echo "$CANDIDATES" | jq 'length')
+          echo "Candidates for expiry (>14 days, no curate:keep): $COUNT"
+          echo ""
+
+          if [[ "$COUNT" -eq 0 ]]; then
+            echo "Nothing to expire. Done."
+            exit 0
+          fi
+
+          EXPIRED=0
+          SKIPPED=0
+
+          while IFS= read -r row; do
+            NUMBER=$(echo "$row" | jq -r '.number')
+            TITLE=$(echo "$row" | jq -r '.title')
+            CREATED=$(echo "$row" | jq -r '.createdAt')
+
+            if [[ "$DRY_RUN" == "true" ]]; then
+              echo "[DRY RUN] Would expire #$NUMBER ($CREATED): $TITLE"
+              SKIPPED=$((SKIPPED + 1))
+            else
+              echo "Expiring #$NUMBER ($CREATED): $TITLE"
+              gh issue edit "$NUMBER" --repo "$REPO" --add-label "auto-expired"
+              gh issue close "$NUMBER" --repo "$REPO" \
+                --comment "Auto-expired: not curated within 14 days. Re-open or re-mine if still relevant."
+              EXPIRED=$((EXPIRED + 1))
+            fi
+          done < <(echo "$CANDIDATES" | jq -c '.[]')
+
+          echo ""
+          echo "=== Summary ==="
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "Dry run: $SKIPPED issue(s) would be expired."
+          else
+            echo "Expired: $EXPIRED issue(s)."
+          fi
