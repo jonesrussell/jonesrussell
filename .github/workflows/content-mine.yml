@@ -24,6 +24,15 @@ jobs:
         with:
           repository: jonesrussell/blog
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies (ajv for seed validation)
+        run: npm ci
+
       - name: Run canonical mining script
         env:
           # CROSS_REPO_TOKEN must have read:org scope to access waaseyaa/* private repos.
